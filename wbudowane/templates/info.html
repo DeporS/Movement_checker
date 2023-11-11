@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info page</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        // Funkcja JavaScript do obsługi kliknięcia przycisku
+        function toggleAlarm() {
+            console.log("Toggle alarm button clicked");
+            // Wyślij żądanie POST do serwera
+            $.post('/toggle_alarm', function(data) {
+                // Odśwież stronę po otrzymaniu odpowiedzi od serwera
+                location.reload();
+            });
+        }
+
+        // Funkcja do pokazania okna modalnego
+        function showChangeCodeModal() {
+            $('#changeCodeModal').modal('show');
+        }
+
+        function changeCode() {
+            var newCode = $('#newCodeInput').val();
+            // Wysyłanie nowego kodu na serwer (możesz to dostosować)
+            $.post('/change_code', { new_code: newCode }, function(data) {
+                if (data === "OK") {
+                    // Jeśli odpowiedź to "OK", zamknij okno modalne
+                    $('#changeCodeModal').modal('hide');
+                    // Możesz też odświeżyć stronę lub podjąć inne działania, jeśli to konieczne
+                    location.reload();
+                } else {
+                    // Obsługa przypadku, gdy odpowiedź nie jest "OK"
+                    console.log("Wystąpił problem podczas zmiany kodu.");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" onclick="showChangeCodeModal()">Zmień kod</button>
+
+            <div class="modal fade" id="changeCodeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Zmień kod</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Pole do wprowadzania nowego kodu -->
+                            <input for="code_field" type="password" id="newCodeInput" class="form-control" placeholder="Nowy kod">
+                        </div>
+                        <div class="modal-footer">
+                            <!-- Przycisk do zatwierdzenia nowego kodu -->
+                            <button type="button" class="btn btn-primary" onclick="changeCode()">Zatwierdź</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-primary" onclick="toggleAlarm()">
+            {{ 'Wyłącz' if alarm_bool else 'Włącz' }} alarm
+            </button>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Godzina</th>
+                    <th>Data</th>
+                    <th>Akcja</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in data %}
+                    <tr>
+                        <td>{{ row[0] }}</td> <!-- ID -->
+                        <td>{{ row[2] }}</td> <!-- Godzina -->
+                        <td>{{ row[1] }}</td> <!-- Data -->
+                        <td>{{ row[3] }}</td> <!-- Akcja -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
