@@ -172,10 +172,12 @@ def monitorRoomProcess():
             timer.cancel()
             globalState.isAlarmArmed = False
             print("alarm disabled")
+            server.insertDate(1)
             continue
     
         # alarm was not disabled
         print("alarm was not disabled")
+        server.insertDate(0)
 
         timer.cancel()
         globalState.isTimedOut = False
