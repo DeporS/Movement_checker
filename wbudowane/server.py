@@ -4,6 +4,8 @@ import time
 import sqlite3
 from datetime import datetime
 
+from State import * 
+
 # some state for comunicating between threads
 mainThreadShouldRun = True
 
@@ -17,25 +19,10 @@ robot_code = "1234"
 # dane z bazy
 data_from_database = []
 
+
+# zgaduje ze to globalState.isAlarmArmed
 # Czy alarm jest wlaczony
-alarm_bool = False
-
-
-class State:
-    def __init__(self):
-        self.mainThreadShouldRun = True
-
-    def setMainThreadShouldRun(self, value):
-        self.mainThreadShouldRun = value
-
-    def getMainThreadShouldRun(self):
-        return self.mainThreadShouldRun
-
-
-# lock when accessing global state
-# except for atomic read in loop - like runMainWorker does
-globalStateLock = threading.Lock()
-globalState = State()
+alarm_bool = False 
 
 
 app = Flask(__name__)
@@ -168,21 +155,19 @@ def process_form():
 
 @app.route('/info_page')
 def info_page():
-    return render_template('info.html', data=data_from_database, alarm_bool=alarm_bool)
+    return render_template('info.html', data=data_from_database, alarm_bool=globalState.isAlarmArmed)
 
 
 @app.route('/change_code', methods=['POST'])
 def change_code():
-    global robot_code
-    robot_code = request.form.get('new_code', '')
+    globalState.password = request.form.get('new_code', '')
     return "OK"
 
 
 @app.route('/toggle_alarm', methods=['POST'])
 def toggle_alarm():
     # Zmiana wartości bool na przeciwną
-    global alarm_bool
-    alarm_bool = not alarm_bool
+    globalState.isAlarmArmed = not globalState.isAlarmArmed
     return "OK"
 
 
@@ -201,8 +186,8 @@ def runMainWorker():
         # insertDate(0)  # Alarm
         time.sleep(3)
         retrieveDate()
-        print(alarm_bool)
-        print(robot_code)
+        print(globalState.isAlarmArmed)
+        print(globalState.password)
         # print(data_from_database)
         if not globalState.getMainThreadShouldRun():
             print('commiting sewside')
