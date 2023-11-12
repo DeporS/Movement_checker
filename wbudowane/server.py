@@ -155,6 +155,7 @@ def process_form():
 
 @app.route('/info_page')
 def info_page():
+    retrieveDate()
     return render_template('info.html', data=data_from_database, alarm_bool=globalState.isAlarmArmed)
 
 
