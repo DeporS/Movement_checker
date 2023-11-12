@@ -112,10 +112,10 @@ def dropDatabase():
 
     try:
         # Wykonaj zapytanie SQL do usunięcia wszystkich danych z tabeli
-        # cursor.execute('DELETE FROM zapisy')
+        cursor.execute('DELETE FROM zapisy')
 
         # Usuniecie calej tabeli
-        cursor.execute('DROP TABLE IF EXISTS zapisy')
+        # cursor.execute('DROP TABLE IF EXISTS zapisy')
 
         # commit
         conn.commit()
