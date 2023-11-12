@@ -146,7 +146,7 @@ def monitorRoomProcess():
         if not globalState.isAlarmArmed:
             
             # wait for '*' to arm the alarm
-            while True:
+            while not globalState.isAlarmArmed:
                 print("waiting for *")
                 newChar = getChar()
                 print(newChar)
