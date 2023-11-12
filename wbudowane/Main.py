@@ -198,8 +198,6 @@ def main():
         t1 = threading.Thread(target=server.runApp).start()
         print(f'start second thread')
         t2 = threading.Thread(target=monitorRoomProcess).start()
-        t1.join()
-        t2.join()
 
     except KeyboardInterrupt:
         print("\nApplication stopped!")
