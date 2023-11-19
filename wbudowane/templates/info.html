@@ -40,38 +40,72 @@
                 }
             });
         }
+
+        function uploadMusic() {
+            var musicFile = $('#musicFileInput')[0].files[0];
+
+            // Utwórz obiekt FormData i dodaj plik
+            var formData = new FormData();
+            formData.append('music_file', musicFile);
+
+            // Wyślij żądanie POST do serwera za pomocą technologii AJAX
+            $.ajax({
+                url: '/upload_music',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    // Obsługa odpowiedzi serwera po pomyślnym przesłaniu pliku
+                    console.log('Muzyka przesłana pomyślnie:', data);
+                    // Dodaj kod obsługi dla swojego przypadku użycia
+                },
+                error: function(error) {
+                    // Obsługa błędu
+                    console.error('Błąd podczas przesyłania muzyki:', error);
+                }
+            });
+        }
     </script>
 </head>
 <body>
     <div class="container mt-5">
-        <div class="form-group">
-            <button type="button" class="btn btn-primary" onclick="showChangeCodeModal()">Zmień kod</button>
+        <div class="row">
+            <div class="col-md-6">
+                <button type="button" class="btn btn-primary" onclick="showChangeCodeModal()">Zmień kod</button>
 
-            <div class="modal fade" id="changeCodeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Zmień kod</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <!-- Pole do wprowadzania nowego kodu -->
-                            <input for="code_field" type="password" id="newCodeInput" class="form-control" placeholder="Nowy kod">
-                        </div>
-                        <div class="modal-footer">
-                            <!-- Przycisk do zatwierdzenia nowego kodu -->
-                            <button type="button" class="btn btn-primary" onclick="changeCode()">Zatwierdź</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                <div class="modal fade" id="changeCodeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Zmień kod</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <!-- Pole do wprowadzania nowego kodu -->
+                                <input for="code_field" type="password" id="newCodeInput" class="form-control" placeholder="Nowy kod">
+                            </div>
+                            <div class="modal-footer">
+                                <!-- Przycisk do zatwierdzenia nowego kodu -->
+                                <button type="button" class="btn btn-primary" onclick="changeCode()">Zatwierdź</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Anuluj</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <button type="button" class="btn btn-primary" onclick="toggleAlarm()">
+                {{ 'Wyłącz' if alarm_bool else 'Włącz' }} alarm
+                </button>
             </div>
+            <div class="col-md-6">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="musicFileInput" accept="audio/*" onchange="uploadMusic()">
+                    <label class="custom-file-label" for="musicFileInput">Wybierz plik</label>
+                </div>
 
-            <button type="button" class="btn btn-primary" onclick="toggleAlarm()">
-            {{ 'Wyłącz' if alarm_bool else 'Włącz' }} alarm
-            </button>
+            </div> 
         </div>
         <table class="table">
             <thead>

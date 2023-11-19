@@ -179,6 +179,25 @@ def func2():
     return 'killing thread'
 
 
+@app.route('/upload_music', methods=['POST'])
+def upload_music():
+    try:
+
+        # Pobierz przesłany plik muzyki
+        music_file = request.files['music_file']
+
+        music = "alarm_music.mp3"
+
+        # Zapisz plik w odpowiednim miejscu na serwerze
+        music_file.save('music/' + music)
+
+        return "OK"
+    except Exception as e:
+        # Obsługa błędu
+        print(f"Błąd podczas przesyłania muzyki: {e}")
+        return "Błąd"
+
+
 def runMainWorker():
     print('runMainWorker')
     while True:
