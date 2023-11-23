@@ -179,7 +179,7 @@ def func2():
     return 'killing thread'
 
 
-musicCounter=  0
+
 @app.route('/upload_music', methods=['POST'])
 def upload_music():
     try:
@@ -202,7 +202,7 @@ def upload_music():
         # Obsługa błędu
         print(f"Błąd podczas przesyłania muzyki: {e}")
         return "Błąd"
-
+upload_music.musicCounter = 0
 
 #  --- running serer only stuff ---
 def runMainWorker():
