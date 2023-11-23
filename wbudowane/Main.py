@@ -51,8 +51,7 @@ matrix = [["1","2","3","A"],
 
 # function to update timeout state
 def updateTimeoutState():
-    print("TIMEOUUUUUT")
-    time.sleep(5)
+    print("TIMEOUT")
     globalState.isTimedOut = True
     return
 
@@ -81,7 +80,6 @@ def handleMoveOnEntry() -> bool:
         newChar = getChar()
         if globalState.isTimedOut:
             print("TIMEOUT2")
-            time.sleep(5)
             return False
         print(newChar)
         
