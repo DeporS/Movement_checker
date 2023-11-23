@@ -15,5 +15,5 @@ class State:
 
 # lock when accessing global state 
 # except for atomic read in loop - like runMainWorker does
-globalStateLock = threading.Lock() 
+musicPlayerLock = threading.Lock() 
 globalState = State()

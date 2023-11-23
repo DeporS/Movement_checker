@@ -13,8 +13,6 @@ mainThreadShouldRun = True
 username = "admin"
 password = "123"
 
-# keyboard password
-robot_code = "1234"
 
 # dane z bazy
 data_from_database = []
@@ -167,8 +165,10 @@ def change_code():
 
 @app.route('/toggle_alarm', methods=['POST'])
 def toggle_alarm():
-    # Zmiana wartości bool na przeciwną
-    globalState.isAlarmArmed = not globalState.isAlarmArmed
+    # Od teraz to tylko wylaczanie alarmu
+    # w sensie ze przesrtaje grac
+    if globalState.isAlarmSounding:
+        globalState.isAlarmSounding = False
     return "OK"
 
 
@@ -179,17 +179,23 @@ def func2():
     return 'killing thread'
 
 
+musicCounter=  0
 @app.route('/upload_music', methods=['POST'])
 def upload_music():
     try:
-
         # Pobierz przesłany plik muzyki
         music_file = request.files['music_file']
 
-        music = "alarm_music.mp3"
+        music = f"alarm_music{musicCounter}.mp3"
+        musicCounter += 1
 
         # Zapisz plik w odpowiednim miejscu na serwerze
         music_file.save('music/' + music)
+
+        # Zatrzymaj odtwarzacz
+        musicPlayerLock.acquire()
+        globalState.player = vlc.MediaPlayer("music/" + music)
+        musicPlayerLock.release()
 
         return "OK"
     except Exception as e:
@@ -198,6 +204,7 @@ def upload_music():
         return "Błąd"
 
 
+#  --- running serer only stuff ---
 def runMainWorker():
     print('runMainWorker')
     while True:

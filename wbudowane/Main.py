@@ -183,6 +183,7 @@ def monitorRoomProcess():
         globalState.isTimedOut = False
         globalState.isPlayerOn = True
         globalState.isAlarmSounding = True
+        musicPlayerLock.acquire()
         globalState.player.play()
         
         # blocks until password is entered
@@ -190,6 +191,7 @@ def monitorRoomProcess():
 
         globalState.isPlayerOn = False
         globalState.player.pause()
+        musicPlayerLock.release()
         globalState.isAlarmSounding = False
         globalState.isAlarmArmed = False
 
