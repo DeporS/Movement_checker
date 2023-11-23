@@ -182,12 +182,13 @@ def func2():
 
 @app.route('/upload_music', methods=['POST'])
 def upload_music():
+    upload_music.musicCounter += 1
+
     try:
         # Pobierz przesłany plik muzyki
         music_file = request.files['music_file']
 
-        music = f"alarm_music{musicCounter}.mp3"
-        musicCounter += 1
+        music = f"alarm_music{upload_music.musicCounter}.mp3"
 
         # Zapisz plik w odpowiednim miejscu na serwerze
         music_file.save('music/' + music)
