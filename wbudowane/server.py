@@ -101,6 +101,108 @@ def retrieveDate():
         conn.close()
 
 
+def insertPeople(name, surname, is_admin):
+    conn = sqlite3.connect('based_baza_danych.db')
+    cursor = conn.cursor()
+    try:
+        # Tworzenie tabeli jeśli nie istnieje
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS pracownicy (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                surname TEXT,
+                admin TEXT CHECK (admin IN ('tak', 'nie')),
+                password INTEGER
+            )
+        ''')
+
+        random_password = random.randint(1000, 9999)
+
+        # Wstawianie danych do tabeli
+        cursor.execute('''
+            INSERT INTO pracownicy (name, surname, admin, password)
+            VALUES (?, ?, ?, ?)
+        ''', (name, surname, is_admin, random_password))
+
+        # Commit
+        conn.commit()
+        print("Dane zostały zapisane pomyślnie.")
+
+    except Exception as e:
+        print(f"Wystąpił błąd: {e}")
+
+    finally:
+        conn.close()
+
+
+def clearPeople():
+    conn = sqlite3.connect('based_baza_danych.db')
+    cursor = conn.cursor()
+    cursor.execute('DROP TABLE IF EXISTS pracownicy')
+    conn.commit()
+
+# clearPeople()
+insertPeople("janek", "konieczko", "nie")
+insertPeople("Krzysztof", "Matyla", "tak")
+
+
+people_from_database = []
+
+
+def retrievePeople():
+    conn = sqlite3.connect('based_baza_danych.db')
+    cursor = conn.cursor()
+
+    try:
+        # Self explanatory
+        cursor.execute('SELECT * FROM pracownicy')
+
+        # Wszystko
+        rows = cursor.fetchall()
+
+        # Wyswietlanie
+        for row in rows:
+            print(
+                f"ID: {row[0]}, Imie: {row[1]}, Nazwisko: {row[2]}, Admin: {row[3]}, Hasło: {row[4]}")
+
+        # zapisanie danych w liscie
+        people_from_database.clear()
+        data = []
+        for row in rows:
+            data = [row[0], row[1], row[2], row[3], row[4]]
+            people_from_database.append(data)
+
+    except Exception as e:
+        print(f"Wystąpił błąd: {e}")
+
+    finally:
+        conn.close()
+
+
+retrievePeople()
+
+
+def get_password_by_id(employee_id):
+    conn = sqlite3.connect('based_baza_danych.db')
+    cursor = conn.cursor()
+
+    # Pobieranie hasła dla określonego id
+    cursor.execute(
+        'SELECT password FROM pracownicy WHERE id = ?', (employee_id,))
+    result = cursor.fetchone()
+
+    # Sprawdzanie, czy znaleziono hasło
+    if result:
+        password = result[0]
+        print(f"Hasło dla pracownika o ID {employee_id}: {password}")
+    else:
+        print(f"Brak pracownika o ID {employee_id}")
+
+    # Zamykanie połączenia
+    conn.close()
+
+    return password
+
 # Cos czego nie chcesz zrobic w nowej robocie na stazu
 
 
@@ -141,8 +243,11 @@ def process_form():
     input_username = request.form['field1']
     input_password = request.form['field2']
 
-    # Sprawdź, czy podane dane są poprawne
-    if input_username == username and input_password == password:
+    # Pobierz hasło dla podanego użytkownika
+    stored_password = str(get_password_by_id(input_username))
+
+    # Sprawdź, czy hasła są identyczne
+    if stored_password == input_password:
         # Przekieruj do /process_form, jeśli dane są poprawne
         return redirect(url_for('info_page'))
     else:
