@@ -80,7 +80,7 @@ def handleMoveOnEntry() -> str:
         newChar = getChar()
         if globalState.isTimedOut:
             print("TIMEOUT2")
-            return False
+            return ""
         print(newChar)
         
 
