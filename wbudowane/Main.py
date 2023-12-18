@@ -90,13 +90,52 @@ def handleMoveOnEntry() -> str:
             continue
 
         if newChar != "#":
-            print("pressed #")
+            print("pressed " + newChar)
             keyStr += newChar
+            continue
+
+        if newChar == "#":
             return keyStr
 
     # time ended
     print("time ended")
     return ""
+
+def handleMoveOnEntry() -> bool:
+    keyStr = ""
+    while not globalState.isTimedOut:
+        print("waiting for password in handleMoveOnEntry")
+        newChar = getChar()
+        if globalState.isTimedOut:
+            print("TIMEOUT2")
+            return False
+        print(newChar)
+        
+
+        # clear input 
+        if newChar == "C":
+            keyStr = ""
+            continue
+
+        if newChar != "#":
+            print("here")
+            keyStr += newChar
+            if len(keyStr) > len(globalState.password) + 1:
+                return False
+            continue
+
+        # need to check if password is correct
+        if keyStr == globalState.password:
+            print("correct password")
+            return True
+
+        # wrong password
+        else:
+            return False
+
+    # time ended
+    print("time ended")
+    return False
 
 
 def handleWrongPasswordInRoom() -> bool:
