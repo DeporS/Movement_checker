@@ -40,7 +40,7 @@ GPIO.setup(C4, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 pir = gpiozero.MotionSensor(4)
 
-TIME_TO_WAIT = 10
+TIME_TO_WAIT = 20
 
 
 matrix = [["1","2","3","A"],
