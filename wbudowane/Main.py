@@ -90,7 +90,6 @@ def handleMoveOnEntry() -> str:
             continue
 
         if newChar != "#":
-            print("pressed " + newChar)
             keyStr += newChar
             continue
 
