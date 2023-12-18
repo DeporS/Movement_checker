@@ -4,7 +4,7 @@ import vlc
 # some state for comunicating between threads
 class State:
     mainThreadShouldRun = True
-    player = vlc.MediaPlayer("sound.mp3")
+    player = vlc.MediaPlayer("./music/alarm_music1.mp3")
     isAlarmArmed = True
     isAlarmSounding = False
     isPlayerOn = False
