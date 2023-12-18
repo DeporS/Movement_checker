@@ -73,7 +73,7 @@ def getChar() -> str:
     return "%" 
 
 # returns true if alarm was turned off correctly
-def handleMoveOnEntry() -> bool:
+def handleMoveOnEntry() -> str:
     keyStr = ""
     while not globalState.isTimedOut:
         print("waiting for password in handleMoveOnEntry")
@@ -90,24 +90,14 @@ def handleMoveOnEntry() -> bool:
             continue
 
         if newChar != "#":
-            print("here")
+            print("pressed #")
             keyStr += newChar
-            if len(keyStr) > len(globalState.password) + 1:
-                return False
-            continue
-
-        # need to check if password is correct
-        if keyStr == globalState.password:
-            print("correct password")
-            return True
-
-        # wrong password
-        else:
-            return False
+            return keyStr
 
     # time ended
     print("time ended")
-    return False
+    return ""
+
 
 def handleWrongPasswordInRoom() -> bool:
     keyStr = ""
@@ -163,15 +153,18 @@ def monitorRoomProcess():
         timer = threading.Timer(TIME_TO_WAIT, updateTimeoutState)
         timer.start()
 
-        wasDisabled = False
-        wasDisabled = handleMoveOnEntry() # blocks for TIME_TO_WAIT seconds
+        person_id = handleMoveOnEntry() # blocks for TIME_TO_WAIT seconds
         
-        if wasDisabled and not globalState.isTimedOut:
-            timer.cancel()
-            globalState.isAlarmArmed = False
-            print("alarm disabled")
-            server.insertDate(1)
-            continue
+        if person_id != "" and person_id.isnumeric():
+            password = server.get_password_by_id(int(person_id))
+            input_pass = handleMoveOnEntry() # block and wait for password
+            if password == input_pass:
+                print("alarm disabled")
+                server.insertDate(1)
+                continue
+            else:
+                print("wrong password")
+
     
         # alarm was not disabled
         print("alarm was not disabled")
@@ -192,6 +185,14 @@ def monitorRoomProcess():
         musicPlayerLock.release()
         globalState.isAlarmSounding = False
         globalState.isAlarmArmed = False
+
+
+
+def lockedOnTooManyAttempts():
+    print("lockedOnTooManyAttempts")
+    # wait for server restart
+    while globalState.isAlarmSounding:
+        pass
 
 
 def main():

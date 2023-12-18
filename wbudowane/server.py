@@ -191,6 +191,7 @@ def get_password_by_id(employee_id):
         'SELECT password FROM pracownicy WHERE id = ?', (employee_id,))
     result = cursor.fetchone()
 
+    password = ""
     # Sprawdzanie, czy znaleziono hasło
     if result:
         password = result[0]
