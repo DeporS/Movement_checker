@@ -101,7 +101,7 @@ def handleMoveOnEntry() -> str:
     return ""
 
 
-def handleWrongPasswordInRoom() -> bool:
+def handleWrongPasswordInRoom(password) -> bool:
     keyStr = ""
     while globalState.isAlarmSounding:
         newChar = getChar()
@@ -114,12 +114,12 @@ def handleWrongPasswordInRoom() -> bool:
 
         if newChar != "#":
             keyStr += newChar
-            if len(keyStr) > len(globalState.password) + 1:
+            if len(keyStr) > len(password) + 1:
                 return False
             continue
         
         # need to check if password is correct
-        if keyStr == globalState.password:
+        if keyStr == password:
             print("correct password in handleWrongPasswordInRoom")
             return True
 
@@ -190,7 +190,7 @@ def monitorRoomProcess():
         musicPlayerLock.release()
 
         # blocks until password is entered
-        handleWrongPasswordInRoom()
+        handleWrongPasswordInRoom(password)
 
         globalState.isPlayerOn = False
         musicPlayerLock.acquire()
