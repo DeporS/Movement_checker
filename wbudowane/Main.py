@@ -161,6 +161,8 @@ def monitorRoomProcess():
             password = server.get_password_by_id(int(person_id))
             input_pass = handleMoveOnEntry() # block and wait for password
             if password == input_pass:
+                timer.cancel()
+                globalState.isAlarmArmed = False
                 print("alarm disabled")
                 server.insertDate(1)
                 continue
