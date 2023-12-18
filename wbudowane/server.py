@@ -46,8 +46,12 @@ def insertDate(action):
         godzina = teraz.strftime('%H:%M:%S')
         if action == 0:
             act = 'Alarm'
-        else:
+        elif action == 1:
             act = 'Odblokowanie kodem'
+        elif action == 2:
+            act = 'Alarm: Podano błędny numer pracownika'
+        elif action == 3:
+            act = 'Wyłączono alarm zdalnie'
 
         # Wstawianie danych do tabeli
         cursor.execute('''
@@ -318,6 +322,8 @@ def runMainWorker():
         print('runMainWorker')
         # insertDate(1)  # Odblokowanie
         # insertDate(0)  # Alarm
+        # insertDate(2)  # Podano bledny numer pracownika
+        # insertDate(3)  # Wylaczenie alarmu zdalnie
         time.sleep(3)
         retrieveDate()
         print(globalState.isAlarmArmed)
