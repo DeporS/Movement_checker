@@ -168,7 +168,32 @@ def monitorRoomProcess():
                 continue
             else:
                 print("wrong password")
+        
+        # invalid person id
+        else:
+            print("invalid person id")
+            timer.cancel()
+            globalState.isTimedOut = False
+            
+            globalState.isAlarmArmed = True
+            globalState.isPlayerOn = True
+            globalState.isAlarmSounding = True
+            musicPlayerLock.acquire()
+            globalState.player.play()
+            musicPlayerLock.release()        
 
+            lockedOnTooManyAttemptsOrWrongID()
+            # this can only happen if alarm was disabled
+            # in the web app
+
+            globalState.isPlayerOn = False
+            musicPlayerLock.acquire()
+            globalState.player.pause()
+            musicPlayerLock.release()
+            globalState.isAlarmSounding = False
+            globalState.isAlarmArmed = False
+
+            continue
     
         # alarm was not disabled
         print("alarm was not disabled")
@@ -180,11 +205,13 @@ def monitorRoomProcess():
         globalState.isAlarmSounding = True
         musicPlayerLock.acquire()
         globalState.player.play()
-        
+        musicPlayerLock.release()
+
         # blocks until password is entered
         handleWrongPasswordInRoom()
 
         globalState.isPlayerOn = False
+        musicPlayerLock.acquire()
         globalState.player.pause()
         musicPlayerLock.release()
         globalState.isAlarmSounding = False
@@ -192,7 +219,7 @@ def monitorRoomProcess():
 
 
 
-def lockedOnTooManyAttempts():
+def lockedOnTooManyAttemptsOrWrongID():
     print("lockedOnTooManyAttempts")
     # wait for server restart
     while globalState.isAlarmSounding:
