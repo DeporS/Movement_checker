@@ -197,6 +197,7 @@ def monitorRoomProcess():
 def main():
     try:
         server.dropDatabase()
+        server.init_db()
         print(f'start first thread')
         t1 = threading.Thread(target=server.runApp).start()
         print(f'start second thread')

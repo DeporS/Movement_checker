@@ -3,15 +3,12 @@ from flask import Flask, render_template, request, redirect, url_for
 import time
 import sqlite3
 from datetime import datetime
+import random
 
 from State import * 
 
 # some state for comunicating between threads
 mainThreadShouldRun = True
-
-# Login
-username = "admin"
-password = "123"
 
 
 # dane z bazy
@@ -142,8 +139,10 @@ def clearPeople():
     conn.commit()
 
 # clearPeople()
-insertPeople("janek", "konieczko", "nie")
-insertPeople("Krzysztof", "Matyla", "tak")
+
+def init_db():
+    insertPeople("janek", "konieczko", "nie")
+    insertPeople("Krzysztof", "Matyla", "tak")
 
 
 people_from_database = []
@@ -179,7 +178,7 @@ def retrievePeople():
         conn.close()
 
 
-retrievePeople()
+# retrievePeople()
 
 
 def get_password_by_id(employee_id):
