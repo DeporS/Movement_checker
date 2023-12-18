@@ -159,6 +159,12 @@ def monitorRoomProcess():
         
         if person_id != "" and person_id.isnumeric():
             password = server.get_password_by_id(int(person_id))
+            if password == "":
+                print("wrong person id")
+                timer.cancel()
+                lockedOnTooManyAttemptsOrWrongID()
+                continue
+
             input_pass = handleMoveOnEntry() # block and wait for password
             if password == input_pass:
                 timer.cancel()
@@ -168,33 +174,9 @@ def monitorRoomProcess():
                 continue
             else:
                 print("wrong password")
+                timer.cancel()
+
         
-        # invalid person id
-        else:
-            print("invalid person id")
-            timer.cancel()
-            globalState.isTimedOut = False
-            
-            globalState.isAlarmArmed = True
-            globalState.isPlayerOn = True
-            globalState.isAlarmSounding = True
-            musicPlayerLock.acquire()
-            globalState.player.play()
-            musicPlayerLock.release()        
-
-            lockedOnTooManyAttemptsOrWrongID()
-            # this can only happen if alarm was disabled
-            # in the web app
-
-            globalState.isPlayerOn = False
-            musicPlayerLock.acquire()
-            globalState.player.pause()
-            musicPlayerLock.release()
-            globalState.isAlarmSounding = False
-            globalState.isAlarmArmed = False
-
-            continue
-    
         # alarm was not disabled
         print("alarm was not disabled")
         server.insertDate(0)
@@ -221,9 +203,26 @@ def monitorRoomProcess():
 
 def lockedOnTooManyAttemptsOrWrongID():
     print("lockedOnTooManyAttempts")
+    globalState.isTimedOut = False
+
+    globalState.isAlarmArmed = True
+    globalState.isPlayerOn = True
+    globalState.isAlarmSounding = True
+    musicPlayerLock.acquire()
+    globalState.player.play()
+    musicPlayerLock.release()
+    
     # wait for server restart
     while globalState.isAlarmSounding:
         pass
+
+    globalState.isPlayerOn = False
+    musicPlayerLock.acquire()
+    globalState.player.pause()
+    musicPlayerLock.release()
+    globalState.isAlarmSounding = False
+    globalState.isAlarmArmed = False
+
 
 
 def main():
