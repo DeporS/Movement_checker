@@ -176,7 +176,15 @@ def monitorRoomProcess():
                 print("wrong password")
                 timer.cancel()
 
+        if person_id == "" or not person_id.isnumeric():
+            print("time ended")
+            timer.cancel()
+            lockedOnTooManyAttemptsOrWrongID()
+            continue
         
+
+
+
         # alarm was not disabled
         print("alarm was not disabled")
         server.insertDate(0)
