@@ -109,11 +109,12 @@ def insertPeople(name, surname, is_admin):
                 name TEXT,
                 surname TEXT,
                 admin TEXT CHECK (admin IN ('tak', 'nie')),
-                password INTEGER
+                password TEXT
             )
         ''')
 
-        random_password = random.randint(1000, 9999)
+        random_password = str(random.randint(1000, 9999))
+        random_password = "1234"
 
         # Wstawianie danych do tabeli
         cursor.execute('''
