@@ -1,11 +1,11 @@
 import threading
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, session, url_for
 import time
 import sqlite3
 from datetime import datetime
 import random
 
-from State import * 
+from State import *
 
 # some state for comunicating between threads
 mainThreadShouldRun = True
@@ -17,16 +17,17 @@ data_from_database = []
 
 # zgaduje ze to globalState.isAlarmArmed
 # Czy alarm jest wlaczony
-alarm_bool = False 
+alarm_bool = False
 
 
 app = Flask(__name__)
+app.secret_key = 'l124iAE1j412EAdajFA132fBM'
 
 
 # Wpisywanie aktualnej daty i godziny do bazy
 
 
-def insertDate(action):
+def insertDate(action, id=0):
     conn = sqlite3.connect('based_baza_danych.db')
     cursor = conn.cursor()
     try:
@@ -36,7 +37,8 @@ def insertDate(action):
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 data TEXT,
                 godzina TEXT,
-                akcja TEXT
+                akcja TEXT,
+                pracownik INTEGER       
             )
         ''')
 
@@ -54,10 +56,16 @@ def insertDate(action):
             act = 'Wyłączono alarm zdalnie'
 
         # Wstawianie danych do tabeli
-        cursor.execute('''
-            INSERT INTO zapisy (data, godzina, akcja)
-            VALUES (?, ?, ?)
-        ''', (data, godzina, act))
+        if action == 1 or action == 3:
+            cursor.execute('''
+                INSERT INTO zapisy (data, godzina, akcja, pracownik)
+                VALUES (?, ?, ?, ?)
+            ''', (data, godzina, act, id))
+        else:
+            cursor.execute('''
+                INSERT INTO zapisy (data, godzina, akcja)
+                VALUES (?, ?, ?)
+            ''', (data, godzina, act))
 
         # Commit
         conn.commit()
@@ -73,13 +81,16 @@ def insertDate(action):
 # Uzyskiwanie danych z bazy
 
 
-def retrieveDate():
+def retrieveDate(admin, id):
     conn = sqlite3.connect('based_baza_danych.db')
     cursor = conn.cursor()
 
     try:
-        # Self explanatory
-        cursor.execute('SELECT * FROM zapisy')
+        # pobranie danych
+        if admin == "nie":
+            cursor.execute('SELECT * FROM zapisy WHERE pracownik = ?', (id,))
+        else:
+            cursor.execute('SELECT * FROM zapisy')
 
         # Wszystko
         rows = cursor.fetchall()
@@ -92,7 +103,7 @@ def retrieveDate():
         data_from_database.clear()
         data = []
         for row in rows:
-            data = [row[0], row[1], row[2], row[3]]
+            data = [row[0], row[1], row[2], row[3], row[4]]
             data_from_database.append(data)
 
     except Exception as e:
@@ -102,7 +113,7 @@ def retrieveDate():
         conn.close()
 
 
-def insertPeople(name, surname, is_admin):
+def insertPeople(name, surname, is_admin, password: str):
     conn = sqlite3.connect('based_baza_danych.db')
     cursor = conn.cursor()
     try:
@@ -117,8 +128,7 @@ def insertPeople(name, surname, is_admin):
             )
         ''')
 
-        random_password = str(random.randint(1000, 9999))
-        random_password = "1234"
+        random_password = password
 
         # Wstawianie danych do tabeli
         cursor.execute('''
@@ -145,9 +155,10 @@ def clearPeople():
 
 # clearPeople()
 
+
 def init_db():
-    insertPeople("janek", "konieczko", "nie")
-    insertPeople("Krzysztof", "Matyla", "tak")
+    insertPeople("janek", "konieczko", "nie", "1337")
+    insertPeople("Krzysztof", "Matyla", "tak", "6969")
 
 
 people_from_database = []
@@ -208,6 +219,29 @@ def get_password_by_id(employee_id):
 
     return password
 
+
+# Info do stronki
+def get_info_by_id(employee_id):
+    conn = sqlite3.connect('based_baza_danych.db')
+    cursor = conn.cursor()
+
+    # Pobieranie hasła dla określonego id
+    cursor.execute(
+        'SELECT * FROM pracownicy WHERE id = ?', (employee_id,))
+    result = cursor.fetchone()
+
+    # Zwracanie info
+    if result:
+        return result
+    else:
+        print(f"Brak pracownika o ID {employee_id}")
+
+    # Zamykanie połączenia
+    conn.close()
+
+    return ""
+
+
 # Cos czego nie chcesz zrobic w nowej robocie na stazu
 
 
@@ -220,7 +254,7 @@ def dropDatabase():
         cursor.execute('DELETE FROM zapisy')
 
         # Usuniecie calej tabeli
-        # cursor.execute('DROP TABLE IF EXISTS zapisy')
+        cursor.execute('DROP TABLE IF EXISTS zapisy')
 
         # commit
         conn.commit()
@@ -253,6 +287,8 @@ def process_form():
 
     # Sprawdź, czy hasła są identyczne
     if stored_password == input_password:
+        # ustaw id pracownika w danej sesji
+        session['logged_ID'] = int(input_username)
         # Przekieruj do /process_form, jeśli dane są poprawne
         return redirect(url_for('info_page'))
     else:
@@ -263,8 +299,13 @@ def process_form():
 
 @app.route('/info_page')
 def info_page():
-    retrieveDate()
-    return render_template('info.html', data=data_from_database, alarm_bool=globalState.isAlarmArmed)
+    logged_ID = session["logged_ID"]
+    info = get_info_by_id(logged_ID)
+    name = info[1]
+    surname = info[2]
+    admin = info[3]
+    retrieveDate(admin, logged_ID)
+    return render_template('info.html', data=data_from_database, alarm_bool=globalState.isAlarmArmed, logged_ID=logged_ID, name=name, surname=surname, admin=admin)
 
 
 @app.route('/change_code', methods=['POST'])
@@ -287,7 +328,6 @@ def func2():
     print("killing thread")
     globalState.setMainThreadShouldRun(False)
     return 'killing thread'
-
 
 
 @app.route('/upload_music', methods=['POST'])
@@ -313,19 +353,24 @@ def upload_music():
         # Obsługa błędu
         print(f"Błąd podczas przesyłania muzyki: {e}")
         return "Błąd"
+
+
 upload_music.musicCounter = 0
 
 #  --- running serer only stuff ---
+
+
 def runMainWorker():
     print('runMainWorker')
     while True:
         print('runMainWorker')
+        retrievePeople()
         # insertDate(1)  # Odblokowanie
         # insertDate(0)  # Alarm
         # insertDate(2)  # Podano bledny numer pracownika
         # insertDate(3)  # Wylaczenie alarmu zdalnie
         time.sleep(3)
-        retrieveDate()
+
         print(globalState.isAlarmArmed)
         print(globalState.password)
         # print(data_from_database)

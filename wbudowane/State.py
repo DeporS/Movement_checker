@@ -2,6 +2,8 @@ import threading
 import vlc
 
 # some state for comunicating between threads
+
+
 class State:
     mainThreadShouldRun = True
     player = vlc.MediaPlayer("./music/alarm_music1.mp3")
@@ -10,10 +12,12 @@ class State:
     isPlayerOn = False
     password = "1234"
     isTimedOut = False
+
     def __init__(self) -> None:
         print("init State")
 
-# lock when accessing global state 
+
+# lock when accessing global state
 # except for atomic read in loop - like runMainWorker does
-musicPlayerLock = threading.Lock() 
+musicPlayerLock = threading.Lock()
 globalState = State()

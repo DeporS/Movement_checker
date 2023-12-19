@@ -70,6 +70,7 @@
 </head>
 <body>
     <div class="container mt-5">
+        
         <div class="row">
             <div class="col-md-6">
                 <button type="button" class="btn btn-primary" onclick="showChangeCodeModal()">Zmień kod</button>
@@ -107,6 +108,15 @@
 
             </div> 
         </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Informacje o użytkowniku</h5>
+                <p class="card-text">ID: {{ logged_ID }}</p>
+                <p class="card-text">Imię: {{ name }}</p>
+                <p class="card-text">Nazwisko: {{ surname }}</p>
+                <p class="card-text">Admin: {{ admin }}</p>
+            </div>
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -114,6 +124,7 @@
                     <th>Godzina</th>
                     <th>Data</th>
                     <th>Akcja</th>
+                    <th>Pracownik</th>
                 </tr>
             </thead>
             <tbody>
@@ -123,6 +134,7 @@
                         <td>{{ row[2] }}</td> <!-- Godzina -->
                         <td>{{ row[1] }}</td> <!-- Data -->
                         <td>{{ row[3] }}</td> <!-- Akcja -->
+                        <td>{{ row[4] }}</td> <!--Pracownik-->
                     </tr>
                 {% endfor %}
             </tbody>
