@@ -88,9 +88,9 @@ def retrieveDate(admin, id):
     try:
         # pobranie danych
         if admin == "nie":
-            cursor.execute('SELECT * FROM zapisy WHERE pracownik = ?', (id,))
+            cursor.execute('SELECT * FROM zapisy WHERE pracownik = ? ORDER BY ID DESC', (id,))
         else:
-            cursor.execute('SELECT * FROM zapisy')
+            cursor.execute('SELECT * FROM zapisy ORDER BY ID DESC')
 
         # Wszystko
         rows = cursor.fetchall()
