@@ -310,7 +310,19 @@ def info_page():
 
 @app.route('/change_code', methods=['POST'])
 def change_code():
-    globalState.password = request.form.get('new_code', '')
+    new_pass = request.form.get('new_code', '')
+    logged_ID = session["logged_ID"]
+    # save to database
+    conn = sqlite3.connect('based_baza_danych.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            'UPDATE pracownicy SET password = ? WHERE id = ?', (new_pass, logged_ID))
+        conn.commit()
+    except Exception as e:
+        print(f"Wystąpił błąd: {e}")
+    finally:
+        conn.close()
     return "OK"
 
 
@@ -319,6 +331,7 @@ def toggle_alarm():
     # Od teraz to tylko wylaczanie alarmu
     # w sensie ze przesrtaje grac
     if globalState.isAlarmSounding:
+        insertDate(3, session["logged_ID"])
         globalState.isAlarmSounding = False
     return "OK"
 

@@ -225,8 +225,6 @@ def lockedOnTooManyAttemptsOrWrongID():
     while globalState.isAlarmSounding:
         pass
 
-    server.insertDate(3)
-
     globalState.isPlayerOn = False
     musicPlayerLock.acquire()
     globalState.player.pause()
