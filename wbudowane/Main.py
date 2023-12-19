@@ -162,6 +162,7 @@ def monitorRoomProcess():
             if password == "":
                 print("wrong person id")
                 timer.cancel()
+                server.insertDate(2)
                 lockedOnTooManyAttemptsOrWrongID()
                 continue
 
@@ -170,7 +171,7 @@ def monitorRoomProcess():
                 timer.cancel()
                 globalState.isAlarmArmed = False
                 print("alarm disabled")
-                server.insertDate(1)
+                server.insertDate(1, person_id)
                 continue
             else:
                 print("wrong password")
@@ -223,6 +224,8 @@ def lockedOnTooManyAttemptsOrWrongID():
     # wait for server restart
     while globalState.isAlarmSounding:
         pass
+
+    server.insertDate(3)
 
     globalState.isPlayerOn = False
     musicPlayerLock.acquire()
