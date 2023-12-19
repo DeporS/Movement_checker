@@ -96,9 +96,11 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary" onclick="toggleAlarm()">
-                {{ 'Wyłącz' if alarm_bool else 'Włącz' }} alarm
-                </button>
+                {% if admin == 'yes' %}
+                    <button type="button" class="btn btn-primary" onclick="toggleAlarm()">
+                        Wyłącz alarm
+                    </button>
+                {% endif %}
             </div>
             <div class="col-md-6">
                 <div class="custom-file">
