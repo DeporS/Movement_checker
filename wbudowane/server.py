@@ -351,7 +351,14 @@ def upload_music():
         # Pobierz przesłany plik muzyki
         music_file = request.files['music_file']
 
-        music = f"alarm_music{upload_music.musicCounter}.mp3"
+        # Pobierz oryginalną nazwę pliku
+        original_filename = music_file.filename
+
+        # Pobierz rozszerzenie pliku
+        file_extension = original_filename.split('.')[-1].lower()
+
+        # Utwórz nazwę pliku z nowym rozszerzeniem
+        music = f"alarm_music{upload_music.musicCounter}.{file_extension}"
 
         # Zapisz plik w odpowiednim miejscu na serwerze
         music_file.save('music/' + music)
