@@ -76,7 +76,7 @@ def play_success_beep():
     p = vlc.MediaPlayer("beep.mp3")
     musicPlayerLock.acquire()
     p.play()
-    time.sleep(1)
+    time.sleep(3)
     p.stop()
     musicPlayerLock.release()
 
