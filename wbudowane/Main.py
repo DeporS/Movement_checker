@@ -4,6 +4,8 @@ import gpiozero
 import time
 import vlc
 import threading
+import subprocess
+
 
 # our server impl
 import server
@@ -73,12 +75,8 @@ def getChar() -> str:
     return "%" 
 
 def play_success_beep():
-    p = vlc.MediaPlayer("beep.mp3")
     musicPlayerLock.acquire()
-    p.play()
-    time.sleep(5)
-    p.stop()
-    print("beep played")
+    subprocess.Popen(["mplayer", "beep.mp3"])
     musicPlayerLock.release()
 
 
