@@ -6,7 +6,7 @@ import vlc
 
 class State:
     mainThreadShouldRun = True
-    player = vlc.MediaPlayer("./music/alarm_music1.mp3")
+    player = vlc.MediaPlayer("sound.mp3")
     isAlarmArmed = True
     isAlarmSounding = False
     isPlayerOn = False

@@ -72,6 +72,15 @@ def getChar() -> str:
     print("TIMEOUT1")
     return "%" 
 
+def play_success_beep():
+    p = vlc.MediaPlayer("bee.mp3")
+    musicPlayerLock.acquire()
+    p.play()
+    time.sleep(1)
+    p.pause()
+    musicPlayerLock.release()
+
+
 # returns true if alarm was turned off correctly
 def handleMoveOnEntry() -> str:
     keyStr = ""
@@ -172,6 +181,7 @@ def monitorRoomProcess():
                 globalState.isAlarmArmed = False
                 print("alarm disabled")
                 server.insertDate(1, person_id)
+                play_success_beep()
                 continue
             else:
                 print("wrong password")
