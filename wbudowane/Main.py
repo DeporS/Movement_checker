@@ -77,7 +77,7 @@ def play_success_beep():
     musicPlayerLock.acquire()
     p.play()
     time.sleep(1)
-    p.pause()
+    p.stop()
     musicPlayerLock.release()
 
 
