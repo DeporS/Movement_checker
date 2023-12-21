@@ -73,7 +73,7 @@ def getChar() -> str:
     return "%" 
 
 def play_success_beep():
-    p = vlc.MediaPlayer("bee.mp3")
+    p = vlc.MediaPlayer("beep.mp3")
     musicPlayerLock.acquire()
     p.play()
     time.sleep(1)
