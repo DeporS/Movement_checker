@@ -159,6 +159,7 @@ def handleWrongPasswordInRoom(password) -> bool:
             if atempts >= maxAtempts:
                 lockedOnTooManyAttemptsOrWrongID()
                 atempts = 0
+                return True
             keyStr = ""
             continue
 
