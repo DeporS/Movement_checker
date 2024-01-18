@@ -65,6 +65,12 @@ def beep_for_ms(miliseconds):
     time.sleep(miliseconds / 1000)
     buzzer.off()
 
+
+def success_beep():
+    for i in range(3):
+        beep_for_ms(500)
+        time.sleep(0.5)
+
 def getChar() -> str:
     while not globalState.isTimedOut:
         for i, line in enumerate([L1, L2, L3, L4]):
@@ -143,6 +149,7 @@ def handleWrongPasswordInRoom(password) -> bool:
         # need to check if password is correct
         if keyStr == password:
             print("correct password in handleWrongPasswordInRoom")
+            success_beep()
             return True
 
         # wrong password
@@ -208,6 +215,7 @@ def monitorRoomProcess():
                 print("alarm disabled")
                 server.insertDate(1, person_id)
                 play_sound("poprawnie_zalogowano.wav")
+                success_beep()
                 atempts = 0
                 continue
             else:
@@ -240,7 +248,7 @@ def monitorRoomProcess():
         globalState.isPlayerOn = True
         globalState.isAlarmSounding = True
         musicPlayerLock.acquire()
-        globalState.player.play()
+        # globalState.player.play()
         musicPlayerLock.release()
 
         # blocks until password is entered
@@ -248,7 +256,7 @@ def monitorRoomProcess():
 
         globalState.isPlayerOn = False
         musicPlayerLock.acquire()
-        globalState.player.pause()
+        # globalState.player.pause()
         musicPlayerLock.release()
         globalState.isAlarmSounding = False
         globalState.isAlarmArmed = False
@@ -263,16 +271,18 @@ def lockedOnTooManyAttemptsOrWrongID():
     globalState.isPlayerOn = True
     globalState.isAlarmSounding = True
     musicPlayerLock.acquire()
-    globalState.player.play()
+    # globalState.player.play()
     musicPlayerLock.release()
     
     # wait for server restart
     while globalState.isAlarmSounding:
-        pass
+        # alarm beep
+        beep_for_ms(500)
+        time.sleep(0.5)
 
     globalState.isPlayerOn = False
     musicPlayerLock.acquire()
-    globalState.player.pause()
+    # globalState.player.pause()
     musicPlayerLock.release()
     globalState.isAlarmSounding = False
     globalState.isAlarmArmed = False
