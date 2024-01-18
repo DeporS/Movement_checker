@@ -148,7 +148,7 @@ def handleWrongPasswordInRoom(password) -> bool:
         if keyStr == password:
             print("correct password in handleWrongPasswordInRoom")
             success_beep()
-            play_sound("poprawnie_zalogowano.wav")
+            play_sound("Uwierzytelnianie_uda.wav")
             return True
 
         # wrong password
@@ -183,11 +183,15 @@ def monitorRoomProcess():
             # 5 seconds to leave the room
             print("Alarm armed in 5 seconds")
             time.sleep(5)
+            play_sound("Wlaczono_alarm.wav")
             continue
 
         
         # start timer 
-        play_sound("wykryto_ruch_prosze.wav")
+        if (atempts == 0):
+            play_sound("Prosze_podac_id_prac")
+        else:
+            play_sound("wykryto_ruch_prosze.wav")
         globalState.isTimedOut = False
         timer = threading.Timer(TIME_TO_WAIT, updateTimeoutState)
         timer.start()
@@ -213,7 +217,7 @@ def monitorRoomProcess():
                 globalState.isAlarmArmed = False
                 print("alarm disabled")
                 server.insertDate(1, person_id)
-                play_sound("poprawnie_zalogowano.wav")
+                play_sound("Uwierzytelnianie_uda.wav")
                 success_beep()
                 atempts = 0
                 continue
@@ -270,7 +274,7 @@ def lockedOnTooManyAttemptsOrWrongID():
     globalState.isPlayerOn = True
     globalState.isAlarmSounding = True
     musicPlayerLock.acquire()
-    # globalState.player.play()
+    play_sound("Zbyt_wiele_blednych.wav")
     musicPlayerLock.release()
     
     # wait for server restart
