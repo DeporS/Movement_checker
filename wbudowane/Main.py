@@ -85,6 +85,8 @@ def getChar() -> str:
 
 def play_sound(name):
     name = "sounds/" + name
+    if not name.endswith(".wav"):
+        name += ".wav"
     musicPlayerLock.acquire()
     subprocess.Popen(["mplayer", name])
     time.sleep(1)
@@ -205,7 +207,7 @@ def monitorRoomProcess():
                 globalState.isAlarmArmed = False
                 print("alarm disabled")
                 server.insertDate(1, person_id)
-                play_sound("poprawnie_zalogowano")
+                play_sound("poprawnie_zalogowano.wav")
                 atempts = 0
                 continue
             else:
