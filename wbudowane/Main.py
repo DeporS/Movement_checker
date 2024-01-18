@@ -87,6 +87,7 @@ def play_sound(name):
     name = "sounds/" + name
     musicPlayerLock.acquire()
     subprocess.Popen(["mplayer", name])
+    time.sleep(1)
     musicPlayerLock.release()
 
 # returns true if alarm was turned off correctly
