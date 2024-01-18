@@ -6,6 +6,8 @@ import vlc
 import threading
 import subprocess
 
+buzzer = gpiozero.Buzzer(17)
+
 
 # our server impl
 import server
@@ -58,6 +60,11 @@ def updateTimeoutState():
     return
 
 
+def beep_for_ms(miliseconds):
+    buzzer.on()
+    time.sleep(miliseconds / 1000)
+    buzzer.off()
+
 def getChar() -> str:
     while not globalState.isTimedOut:
         for i, line in enumerate([L1, L2, L3, L4]):
@@ -67,6 +74,7 @@ def getChar() -> str:
                     while(GPIO.input(row) == GPIO.HIGH):
                         pass
                     GPIO.output(line, GPIO.LOW)
+                    beep_for_ms(100)
                     return matrix[i][j]
             GPIO.output(line, GPIO.LOW)
         time.sleep(0.1)
@@ -74,11 +82,12 @@ def getChar() -> str:
     print("TIMEOUT1")
     return "%" 
 
-def play_success_beep():
-    musicPlayerLock.acquire()
-    subprocess.Popen(["mplayer", "beep.mp3"])
-    musicPlayerLock.release()
 
+def play_sound(name):
+    name = "sounds/" + name
+    musicPlayerLock.acquire()
+    subprocess.Popen(["mplayer", name])
+    musicPlayerLock.release()
 
 # returns true if alarm was turned off correctly
 def handleMoveOnEntry() -> str:
@@ -110,6 +119,8 @@ def handleMoveOnEntry() -> str:
 
 
 def handleWrongPasswordInRoom(password) -> bool:
+    atempts = 0
+    maxAtempts = 5
     keyStr = ""
     while globalState.isAlarmSounding:
         newChar = getChar()
@@ -134,10 +145,18 @@ def handleWrongPasswordInRoom(password) -> bool:
         # wrong password
         else:
             print("wrong password in handleWrongPasswordInRoom")
+            play_sound("bledne_haslo.wav")
+            atempts += 1
+            if atempts >= maxAtempts:
+                lockedOnTooManyAttemptsOrWrongID()
+                atempts = 0
             keyStr = ""
             continue
 
 def monitorRoomProcess():
+    atempts = 0
+    maxAtempts = 5
+
     while True:
         pir.wait_for_motion()
         print("You moved")
@@ -159,6 +178,7 @@ def monitorRoomProcess():
 
         
         # start timer 
+        play_sound("wykryto_ruch_prosze.wav")
         globalState.isTimedOut = False
         timer = threading.Timer(TIME_TO_WAIT, updateTimeoutState)
         timer.start()
@@ -171,7 +191,11 @@ def monitorRoomProcess():
                 print("wrong person id")
                 timer.cancel()
                 server.insertDate(2)
-                lockedOnTooManyAttemptsOrWrongID()
+                play_sound("nie_ma_pracownika_o.wav")
+                atempts += 1
+                if atempts >= maxAtempts:
+                    lockedOnTooManyAttemptsOrWrongID()
+                    atempts = 0
                 continue
 
             input_pass = handleMoveOnEntry() # block and wait for password
@@ -180,16 +204,24 @@ def monitorRoomProcess():
                 globalState.isAlarmArmed = False
                 print("alarm disabled")
                 server.insertDate(1, person_id)
-                play_success_beep()
+                play_sound("poprawnie_zalogowano")
+                atempts = 0
                 continue
             else:
                 print("wrong password")
+                atempts += 1
                 timer.cancel()
+                if atempts >= maxAtempts:
+                    lockedOnTooManyAttemptsOrWrongID()
+                    atempts = 0
 
         if person_id == "" or not person_id.isnumeric():
             print("time ended")
             timer.cancel()
-            lockedOnTooManyAttemptsOrWrongID()
+            atempts += 1
+            if atempts >= maxAtempts:
+                lockedOnTooManyAttemptsOrWrongID()
+                atempts = 0
             continue
         
 
@@ -197,6 +229,7 @@ def monitorRoomProcess():
 
         # alarm was not disabled
         print("alarm was not disabled")
+        play_sound("bledne_haslo.wav")
         server.insertDate(0)
 
         timer.cancel()
