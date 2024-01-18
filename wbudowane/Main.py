@@ -274,9 +274,7 @@ def lockedOnTooManyAttemptsOrWrongID():
     globalState.isAlarmArmed = True
     globalState.isPlayerOn = True
     globalState.isAlarmSounding = True
-    musicPlayerLock.acquire()
     play_sound("Zbyt_wiele_blednych.wav")
-    musicPlayerLock.release()
     
     # wait for server restart
     while globalState.isAlarmSounding:
@@ -285,8 +283,6 @@ def lockedOnTooManyAttemptsOrWrongID():
         time.sleep(0.5)
 
     globalState.isPlayerOn = False
-    musicPlayerLock.acquire()
-    # globalState.player.pause()
     musicPlayerLock.release()
     globalState.isAlarmSounding = False
     globalState.isAlarmArmed = False
