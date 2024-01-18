@@ -251,17 +251,11 @@ def monitorRoomProcess():
         globalState.isTimedOut = False
         globalState.isPlayerOn = True
         globalState.isAlarmSounding = True
-        musicPlayerLock.acquire()
-        # globalState.player.play()
-        musicPlayerLock.release()
 
         # blocks until password is entered
         handleWrongPasswordInRoom(password)
 
         globalState.isPlayerOn = False
-        musicPlayerLock.acquire()
-        # globalState.player.pause()
-        musicPlayerLock.release()
         globalState.isAlarmSounding = False
         globalState.isAlarmArmed = False
 
@@ -283,7 +277,6 @@ def lockedOnTooManyAttemptsOrWrongID():
         time.sleep(0.5)
 
     globalState.isPlayerOn = False
-    musicPlayerLock.release()
     globalState.isAlarmSounding = False
     globalState.isAlarmArmed = False
 
