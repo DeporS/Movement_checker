@@ -148,6 +148,7 @@ def handleWrongPasswordInRoom(password) -> bool:
         if keyStr == password:
             print("correct password in handleWrongPasswordInRoom")
             success_beep()
+            play_sound("poprawnie_zalogowano.wav")
             return True
 
         # wrong password
