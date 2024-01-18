@@ -67,9 +67,7 @@ def beep_for_ms(miliseconds):
 
 
 def success_beep():
-    for i in range(3):
-        beep_for_ms(500)
-        time.sleep(0.5)
+    beep_for_ms(500)
 
 def getChar() -> str:
     while not globalState.isTimedOut:
